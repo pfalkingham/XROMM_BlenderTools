@@ -1,5 +1,7 @@
 # XROMM_BlenderTools
-A version of the XROMM Maya Tools (https://bitbucket.org/xromm/xromm_mayatools), but for blender --In Progress--
+A version of the XROMM Maya Tools (https://bitbucket.org/xromm/xromm_mayatools), but for blender 
+
+## --In Progress--
 
 Original Maya tools written by Dave Baier (supported by the US National Science Foundation through an Advances in Biological Informatics grant to PI Elizabeth Brainerd and CoPIs Stephen Gatesy and David Baier, see link above)
 
