@@ -19,7 +19,7 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 -- Xcam import (based on xcam02): import cameras and image planes as exported from XMALab
 
--- imp:  can import rigid body transormations, xyz coordinates, objs.  This is integral to animation, but also the most complex tool
+-- imp:  can import rigid body transormations, xyz coordinates, objs.  This is integral to animation, but also the most complex tool. Priority is to start with just importing xyz translation/rotation, rigid body matrix, 
  
 -- axes: create axes at joints.
 
