@@ -17,7 +17,9 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 -- Addon UI: Essentially the equivelent of the MayaTools shelf, a way to interact with the scripts.
 
--- Xcam import (based on xcam02): import cameras and image planes as exported from XMALab
+~~-- Xcam import (based on mayacamsv2): import cameras and image planes as exported from XMALab~~  DONE!
+
+----[optional] Xcam import based on mayacamsv1
 
 -- imp:  can import rigid body transormations, xyz coordinates, objs.  This is integral to animation, but also the most complex tool. Priority is to start with just importing xyz translation/rotation, rigid body matrix, 
  
