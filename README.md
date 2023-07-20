@@ -3,7 +3,7 @@ A version of the XROMM Maya Tools (https://bitbucket.org/xromm/xromm_mayatools),
 
 ## --In Progress--
 
-Original Maya tools written by Dave Baier (supported by the US National Science Foundation through an Advances in Biological Informatics grant to PI Elizabeth Brainerd and CoPIs Stephen Gatesy and David Baier, see link above)
+Original Maya tools written by <a href="https://biology.providence.edu/faculty-members/david-baier/">Dave Baier</a> (supported by the US National Science Foundation through an Advances in Biological Informatics grant to PI <a href = "https://vivo.brown.edu/display/ebrainer">Elizabeth Brainerd</a> and CoPIs <a href="https://vivo.brown.edu/display/sgatesy">Stephen Gatesy</a> and David Baier, see link above)
 
 I aim to replicate functionality, rather than code.  Maya has become a bloated mess of a software package, takes ages to start up, installs a bunch of cruft (Autodesk app), and is generally not seeing much active development.  Blender is free and open source, which is far better situation for a set of science tools.  Blender is also much quicker, and more in the community are familiar with it.
 
