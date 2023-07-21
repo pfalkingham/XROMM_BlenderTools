@@ -7,8 +7,6 @@ Original Maya tools written by <a href="https://biology.providence.edu/faculty-m
 
 I aim to replicate functionality, rather than code.  Maya has become a bloated mess of a software package, takes ages to start up, installs a bunch of cruft (Autodesk app), and is generally not seeing much active development.  Blender is free and open source, which is far better situation for a set of science tools.  Blender is also much quicker, and more in the community are familiar with it.
 
-This repository is so in progress, nothing has been added yet :)
-
 Below is a to-do list, in order of priority.  The priority is based on replicating the tools I use most.  Others are welcome to contribute.
 
 # To Do
@@ -21,7 +19,7 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 ----[optional] Xcam import based on mayacamsv1
 
--- imp:  can import rigid body transormations, xyz coordinates, objs.  This is integral to animation, but also the most complex tool. Priority is to start with just importing xyz translation/rotation, rigid body matrix, 
+-- imp:  ~~can import rigid body transormations~~, xyz coordinates, ~~objs~~.  This is integral to animation, but also the most complex tool. Priority is to start with just importing xyz translation/rotation, rigid body matrix
  
 -- axes: create axes at joints.
 
@@ -31,11 +29,11 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 -- CT export: Exports xyz coordinates of CT markers
 
--- vAvg: Calculates average position of a selection of verticies and puts a locator there
+-- vAvg: Calculates average position of a selection of verticies and puts a locator there (related to the above)
 
 -- exp: Export data.  Complex, and native albeit cumbersome methods exist natively in blender, or can be scripted later.
 
-## Low Priority because I don't use them, but definately useful.
+## Low Priority because I don't use them, but useful to others.
 
 -- jAx: Joint axes, not something I've used recently, but integral to some peoples workflows
 
@@ -43,5 +41,5 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 ## No plans to implement:
 
--- PSDR: pan/scan for looking through xcams.  Blender handles this differently, may be native
+-- PSDR: pan/scan for looking through xcams.  Blender handles this differently and you can do this natively without the need for PSDR.
 -- PStrn: Shader related - may leave this out and handle manually in blender.  Not vital, so may be implemented much later.
