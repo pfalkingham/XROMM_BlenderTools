@@ -11,13 +11,13 @@ import re
 #############################################
 
 #Hardcodefilename (pass from UI later)
-mayacamfile="C:/Users/pfalk/OneDrive/WORK/CurrentWork/MyBlenderStuff/XROMM ToolKit for Blender/Sample Data/Calibration_cam1_MayaCam1.txt"
+mayacamfile="C:\\Users\\pfalk\\OneDrive\\WORK\\CurrentWork\\MyBlenderStuff\\XROMM ToolKit for Blender\\Sample Data\\Calibration_cam2_MayaCam2.txt"
 #Hardcoded camera name (pass from UI later)
-camName = "xCam01"
+camName = "xCam02"
 #hardcoded image path (pass from UI later)
-image_path = "C:\\Users\\pfalk\\OneDrive\\WORK\\CurrentWork\\MyBlenderStuff\\XROMM ToolKit for Blender\\Sample Data\\Camera1UND\\Camera1_UND.0001.jpg"
+image_path = "C:\\Users\\pfalk\\OneDrive\\WORK\\CurrentWork\\MyBlenderStuff\\XROMM ToolKit for Blender\\Sample Data\\Camera2UND\\Camera2_UND.0001.jpg"
 #hardcoded checkbox for if image sequence or not
-is_image_sequence = "1"
+is_image_sequence = "True"
 
 
 file = open(mayacamfile, "r") 
@@ -139,7 +139,7 @@ constraint.use_max_x = True
 constraint.use_min_y = True
 constraint.use_max_y = True
 constraint.owner_space = 'CUSTOM'
-constraint.space_object = bpy.data.objects["xCam01"]
+constraint.space_object = bpy.data.objects[camera.name]
 
 
 # Set the constraint limits to zero
@@ -224,7 +224,7 @@ node_tree.nodes.clear()
 image_node = node_tree.nodes.new(type='ShaderNodeTexImage')
 
 # Check if the file is an image sequence or movie file
-if is_image_sequence == "1":
+if is_image_sequence == "True":
     # Check if the file is a movie file
     if os.path.splitext(image_path)[1].lower() in {'.mp4', '.avi', '.mov'}:
         # Set the node type to 'ShaderNodeTexMovie'
