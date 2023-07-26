@@ -25,6 +25,8 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 ~~-- axes: create axes at joints.~~
 
 ~~-- oRel: calculates relative motion between two axes.~~
+
+~~-- jAx: Joint axes integral to some peoples workflows~~ - This is now done, as can be accomplished through creating axes, then running relative motion.
  
 ## Low Priority 
 
@@ -36,9 +38,7 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 ## Low Priority because I don't use them, but useful to others.
 
--- jAx: Joint axes, not something I've used recently, but integral to some peoples workflows
-
--- jcs: Joint coordinate system, as above.
+-- jcs: Joint coordinate system, not sure I've ever used this.
 
 ## No plans to implement:
 
