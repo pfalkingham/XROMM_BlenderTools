@@ -19,11 +19,12 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 ----[optional] Xcam import based on mayacamsv1
 
--- imp:  ~~can import rigid body transormations~~, xyz coordinates, ~~objs~~.  This is integral to animation, but also the most complex tool. Priority is to start with just importing xyz translation/rotation, rigid body matrix
+-- imp:  ~~can import rigid body transormations~~, xyz coordinates, ~~objs~~.  This is integral to animation, but also the most complex tool. Priority is to start with just importing xyz translation/rotation, rigid body matrix.
+---- rigid body transformations done.  XYZ translations to do.
  
--- axes: create axes at joints.
+~~-- axes: create axes at joints.~~
 
--- oRel: calculates relative motion between two axes.
+~~-- oRel: calculates relative motion between two axes.~~
  
 ## Low Priority 
 
@@ -31,7 +32,7 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 -- vAvg: Calculates average position of a selection of verticies and puts a locator there (related to the above)
 
--- exp: Export data.  Complex, and native albeit cumbersome methods exist natively in blender, or can be scripted later.
+-- exp: Export data.  Complex, and native albeit cumbersome methods exist in blender, or can be scripted later.
 
 ## Low Priority because I don't use them, but useful to others.
 
