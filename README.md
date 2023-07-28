@@ -1,6 +1,13 @@
 # XROMM_BlenderTools
 A version of the XROMM Maya Tools (https://bitbucket.org/xromm/xromm_mayatools), but for blender 
 
+## A warning ##
+The experts of XROMM are still using Maya.  Don't expect much help if you use this. In fact, I _strongly_ recommend you don't use this for anything important just yet! 
+
+## YouTube video ##
+
+You can see it working here: https://youtu.be/zRH4XBChrgA
+
 ## --In Progress--
 
 Original Maya tools written by <a href="https://biology.providence.edu/faculty-members/david-baier/">Dave Baier</a> (supported by the US National Science Foundation through an Advances in Biological Informatics grant to PI <a href = "https://vivo.brown.edu/display/ebrainer">Elizabeth Brainerd</a> and CoPIs <a href="https://vivo.brown.edu/display/sgatesy">Stephen Gatesy</a> and David Baier, see link above)
