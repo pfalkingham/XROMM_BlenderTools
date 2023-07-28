@@ -1,6 +1,8 @@
 # XROMM_BlenderTools
 A version of the XROMM Maya Tools (https://bitbucket.org/xromm/xromm_mayatools), but for blender 
 
+Download latest release here: https://github.com/pfalkingham/XROMM_BlenderTools/releases
+
 ## A warning ##
 The experts of XROMM are still using Maya.  Don't expect much help if you use this. In fact, I _strongly_ recommend you don't use this for anything important just yet! 
 
