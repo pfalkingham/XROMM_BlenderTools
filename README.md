@@ -22,14 +22,14 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
 
 ## High priority:
 
--- Addon UI: Essentially the equivelent of the MayaTools shelf, a way to interact with the scripts.
+~~-- Addon UI: Essentially the equivelent of the MayaTools shelf, a way to interact with the scripts.~~
 
 ~~-- Xcam import (based on mayacamsv2): import cameras and image planes as exported from XMALab~~  DONE!
 
-----[optional] Xcam import based on mayacamsv1
+----[optional] Xcam import based on mayacamsv1 <- is there really any need?  Lot of work to support out-dated xcam format.
 
--- imp:  ~~can import rigid body transormations~~, xyz coordinates, ~~objs~~.  This is integral to animation, but also the most complex tool. Priority is to start with just importing xyz translation/rotation, rigid body matrix.
----- rigid body transformations done.  XYZ translations to do.
+-- import:  ~~can import rigid body transormations~~, xyz coordinates to new objects, ~~objs~~.  
+
  
 ~~-- axes: create axes at joints.~~
 
@@ -39,11 +39,11 @@ Below is a to-do list, in order of priority.  The priority is based on replicati
  
 ## Low Priority 
 
--- CT export: Exports xyz coordinates of CT markers
+~~-- CT export: Exports xyz coordinates of CT markers~~
 
--- vAvg: Calculates average position of a selection of verticies and puts a locator there (related to the above)
+~~-- vAvg: Calculates average position of a selection of verticies and puts a locator there (related to the above)~~
 
--- exp: Export data.  Complex, and native albeit cumbersome methods exist in blender, or can be scripted later.
+~~-- exp: Export data.  Complex, and native albeit cumbersome methods exist in blender, or can be scripted later.~~
 
 ## Low Priority because I don't use them, but useful to others.
 
