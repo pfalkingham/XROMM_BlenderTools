@@ -122,13 +122,55 @@ class ImportPanel(bpy.types.Panel):
 
         layout.label(text="Select CSV File:")
         layout.prop(scene, "importfile", text="CSV")
-        layout.label(text = "(ToDo: to selected object or new sphere(s))")  #maybe we'll make this as simple as 'if no object selected, create a sphere
         layout.operator("scene.importfile")
+        layout.label(text = "(ToDo: to selected object or new sphere(s))")  #maybe we'll make this as simple as 'if no object selected, create a sphere
 
 
 ###########################################################
 #MARKERS UI CODE
 ###########################################################
+
+# Define a boolean property for the checkbox
+bpy.types.Scene.isSeparate = bpy.props.BoolProperty(
+    name="Separate object?",
+    description="Do you wish to separate the object into peices, and make a locator for each?",
+    default=False
+)
+bpy.types.Scene.isSlow = bpy.props.BoolProperty(
+    name="Slow or Fast",
+    description="Slow - vertex based, Fast - bounding box based",
+    default=False
+)
+
+# Define an operator for calling vavg
+class vAVGOperator(bpy.types.Operator):
+    bl_idname = "scene.vavg"
+    bl_label = "Calculate marker positions"
+    bl_description = "Calculate marker positions"
+
+    def execute(self, context):
+        ###########################################################
+        # TODO: Add logic here
+        from . import vAvg
+        vAvg.vertAvg(context.scene.isSlow, context.scene.isSeparate)
+        ###########################################################
+        self.report({'INFO'}, "doing markers")
+        return {'FINISHED'}
+    
+# Define an operator for ctex
+class ctExOperator(bpy.types.Operator):
+    bl_idname = "scene.ctex"
+    bl_label = "export marker positions"
+    bl_description = "Export selected marker positions"
+
+    def execute(self, context):
+        ###########################################################
+        # TODO: Add logic here
+        from . import ctExp
+        bpy.ops.export_data.marker_data('INVOKE_DEFAULT')
+        ###########################################################
+        self.report({'INFO'}, "doing markers")
+        return {'FINISHED'}
 
 # Define a panel class
 class markersPanel(bpy.types.Panel):
@@ -143,9 +185,23 @@ class markersPanel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
 
-        layout.label(text = "not yet implemented:")
-        layout.label(text = "vAvg")
-        layout.label(text = "CTex")
+        layout.label(text = "vAvg - Marker locations")
+        # Create a boolean variable called isSeparate
+        layout.prop(scene, "isSeparate", text="Separate objects?")
+        # Add a segmented control for "Fast" or "Accurate"
+        row = layout.row(align=True)
+        if scene.isSlow:
+            row.prop(scene, "isSlow", toggle=True, text="Accurate", icon="RADIOBUT_ON")
+            row.prop(scene, "isSlow", toggle=True, text="Fast", icon="RADIOBUT_OFF")
+        else:
+            row.prop(scene, "isSlow", toggle=True, text="Accurate", icon="RADIOBUT_OFF")
+            row.prop(scene, "isSlow", toggle=True, text="Fast", icon="RADIOBUT_ON")
+        #need a button:
+        layout.operator("scene.vavg", text="Calculate marker positions")
+        layout.separator()
+        layout.label(text = "CTexport")
+        #just a button
+        layout.operator("scene.ctex", text="Export marker positions")
 
 
 
@@ -287,7 +343,18 @@ class exportPanel(bpy.types.Panel):
 ###########################################################
 
 # Register the classes
-classes = (CreateXCamOperator, XCamPanel, ImportPanel, markersPanel, axesPanel, exportPanel,CreateAxesWOOperator,CreateAxesWOperator,CalculateRelativeMotionOperator,ImportOperator)
+classes = (CreateXCamOperator, 
+           XCamPanel, 
+           ImportPanel, 
+           markersPanel, 
+           axesPanel, 
+           exportPanel,
+           CreateAxesWOOperator,
+           CreateAxesWOperator,
+           CalculateRelativeMotionOperator,
+           ImportOperator,
+           vAVGOperator,
+           ctExOperator)
 
 def register():
     for cls in classes:

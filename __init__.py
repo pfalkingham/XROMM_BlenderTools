@@ -1,3 +1,9 @@
+#########################################
+# XROMM Toolkit for Blender, initialization file
+# Written by Peter Falkingham, July 2023.
+#########################################
+
+
 bl_info = {
     "name": "XROMM toolkit for Blender",
     "description": "XROMM toolkit modified for Blender",
@@ -15,6 +21,8 @@ from . import createAxes
 from . import oRel
 from . import xCamBlender
 from . import xrommimport
+from . import vAvg
+from . import ctExp
 
 classes = (
     xrommUI.CreateXCamOperator,
@@ -27,6 +35,9 @@ classes = (
     xrommUI.CreateAxesWOperator,
     xrommUI.CalculateRelativeMotionOperator,
     xrommUI.ImportOperator,
+    xrommUI.vAVGOperator,
+    xrommUI.ctExOperator,
+    ctExp.ExportMarkerData,
 )
 
 def register():
