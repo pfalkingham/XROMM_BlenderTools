@@ -1,3 +1,10 @@
+#######################
+# UI code form XROMM toolkit for blender
+# Written by Peter Falkingham
+
+
+
+
 import bpy
 
 ###########################################################
@@ -154,7 +161,7 @@ class vAVGOperator(bpy.types.Operator):
         from . import vAvg
         vAvg.vertAvg(context.scene.isSlow, context.scene.isSeparate)
         ###########################################################
-        self.report({'INFO'}, "doing markers")
+        self.report({'INFO'}, "calculating markers")
         return {'FINISHED'}
     
 # Define an operator for ctex
@@ -169,7 +176,7 @@ class ctExOperator(bpy.types.Operator):
         from . import ctExp
         bpy.ops.export_data.marker_data('INVOKE_DEFAULT')
         ###########################################################
-        self.report({'INFO'}, "doing markers")
+        self.report({'INFO'}, "exporting markers")
         return {'FINISHED'}
 
 # Define a panel class
@@ -318,6 +325,24 @@ class CalculateRelativeMotionOperator(bpy.types.Operator):
 #Export UI CODE
 ###########################################################
 
+# Define a boolean property for the checkbox
+bpy.types.Scene.isAnimation = bpy.props.BoolProperty(
+    name="Export Animated data ?",
+    description="Do you wish to export animated data (full timeline)?",
+    default=True
+)
+bpy.types.Scene.isTranslation = bpy.props.BoolProperty(
+    name="Export Translations",
+    description="include translations in exported data",
+    default=True
+)
+bpy.types.Scene.isRotation = bpy.props.BoolProperty(
+    name="Export Rotations",
+    description="include rotations in exported data",
+    default=True
+)
+
+
 # Define a panel class
 class exportPanel(bpy.types.Panel):
     bl_label = "Export data"
@@ -330,13 +355,32 @@ class exportPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        layout.label(text = "not yet implemented:")
         layout.label(text = "Export selected object(s):")
         layout.label(text = "Translation | Rotation | Trans/Rot")
+        #three checkboxes for isnamation, istranslation, and isrotation
+        row = layout.row()
+        row.prop(scene, "isAnimation", text="Animation")
+        row.prop(scene, "isTranslation", text="Translation")
+        row.prop(scene, "isRotation", text="Rotation")
+        #button to call the export script
+        layout.operator("export.xromm_data", text="Export XROMM data")
 
 
+# Define an operator for exporting XROMM data
+class xrommExportOperator(bpy.types.Operator):
+    bl_idname = "export.xromm_data"
+    bl_label = "export XROMM data"
+    bl_description = "Export trans/rot of selected objects"
 
-
+    def execute(self, context):
+        ###########################################################
+        # TODO: Add logic here
+        from . import ExportXROMMData
+        scene = context.scene
+        bpy.ops.export_data.xromm_data('INVOKE_DEFAULT')
+        ###########################################################
+        self.report({'INFO'}, "exporting XROMM data")
+        return {'FINISHED'}
 
 ###########################################################
 #Register/Unregister Classes (may need changing for addon)
@@ -354,7 +398,9 @@ classes = (CreateXCamOperator,
            CalculateRelativeMotionOperator,
            ImportOperator,
            vAVGOperator,
-           ctExOperator)
+           ctExOperator,
+           xrommExportOperator,
+           )
 
 def register():
     for cls in classes:

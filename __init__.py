@@ -23,6 +23,7 @@ from . import xCamBlender
 from . import xrommimport
 from . import vAvg
 from . import ctExp
+from . import ExportXROMMData
 
 classes = (
     xrommUI.CreateXCamOperator,
@@ -37,7 +38,9 @@ classes = (
     xrommUI.ImportOperator,
     xrommUI.vAVGOperator,
     xrommUI.ctExOperator,
+    xrommUI.xrommExportOperator,
     ctExp.ExportMarkerData,
+    ExportXROMMData.ExpXROMMData,
 )
 
 def register():
