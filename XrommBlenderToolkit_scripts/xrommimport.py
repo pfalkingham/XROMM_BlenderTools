@@ -60,8 +60,7 @@ def importRBT(importCSV):
 
         # Loop through each transformation and create a keyframe for each frame
         for i, matrix in enumerate(transformations):
-            
-            
+                       
                     
             # Transpose the matrix using numpy
             matrix_data_transposed = np.transpose(matrix)
@@ -77,6 +76,7 @@ def importRBT(importCSV):
 
             # Create a keyframe for the object's world matrix
             frame_number = 1 + i
-            selected.keyframe_insert(data_path='location', frame=frame_number)
-            selected.keyframe_insert(data_path='rotation_euler', frame=frame_number)
-            selected.keyframe_insert(data_path='scale', frame=frame_number)
+            if not np.isnan(matrix).any():  #if the matrix contains NaNs, don't keyframe it
+                selected.keyframe_insert(data_path='location', frame=frame_number)
+                selected.keyframe_insert(data_path='rotation_euler', frame=frame_number)
+                selected.keyframe_insert(data_path='scale', frame=frame_number)
