@@ -24,6 +24,7 @@ from . import xrommimport
 from . import vAvg
 from . import ctExp
 from . import ExportXROMMData
+from . import transrotimport
 
 classes = (
     xrommUI.CreateXCamOperator,
@@ -36,6 +37,7 @@ classes = (
     xrommUI.CreateAxesWOperator,
     xrommUI.CalculateRelativeMotionOperator,
     xrommUI.ImportOperator,
+    xrommUI.ImportTransRotOperator,
     xrommUI.vAVGOperator,
     xrommUI.ctExOperator,
     xrommUI.xrommExportOperator,

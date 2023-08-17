@@ -1,3 +1,10 @@
+###############################
+# Script to export XYZ translations of markers in Blender XROMM toolkit
+# Written By Peter FAlkingham July 2023
+###############################
+
+
+
 import bpy
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper

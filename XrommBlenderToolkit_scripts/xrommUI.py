@@ -1,11 +1,10 @@
 #######################
-# UI code form XROMM toolkit for blender
-# Written by Peter Falkingham
-
-
-
+# UI code for XROMM toolkit for blender
+# Written by Peter Falkingham July/August 2023
+#######################
 
 import bpy
+
 
 ###########################################################
 #XCAM UI CODE
@@ -99,17 +98,51 @@ bpy.types.Scene.importfile = bpy.props.StringProperty(
     subtype='FILE_PATH'
 )
 
+# Define a boolean property for the checkboxes
+bpy.types.Scene.isTranslationImp = bpy.props.BoolProperty(
+    name="import Translations",
+    description="include translations in exported data",
+    default=True
+)
+bpy.types.Scene.isRotationImp = bpy.props.BoolProperty(
+    name="import Rotations",
+    description="include rotations in exported data",
+    default=False
+)
+
+#new object or selected
+bpy.types.Scene.new_or_selected = bpy.props.EnumProperty (
+    items=[
+        ('NEW', 'New Sphere(s)', ''),
+        ('SELECTED', 'Selected object', '')
+    ],
+    default='NEW'
+)
+
 # Define an operator for creating an xCam
 class ImportOperator(bpy.types.Operator):
     bl_idname = "scene.importfile"
-    bl_label = "Import Data to selected object"
+    bl_label = "Import Rigid Body Data to selected object"
     bl_description = "Import data"
 
     def execute(self, context):
         ###########################################################
-        # TODO: Add logic here
         from . import xrommimport
         xrommimport.importRBT(context.scene.importfile)
+        ###########################################################
+        self.report({'INFO'}, "importing csv")
+        return {'FINISHED'}
+    
+# Define an operator for creating an xCam
+class ImportTransRotOperator(bpy.types.Operator):
+    bl_idname = "scene.importtrfile"
+    bl_label = "Import translation/rotation data"
+    bl_description = "Import translation and/or rotation data to selected object or new sphere(s)"
+
+    def execute(self, context):
+        ###########################################################
+        from . import transrotimport
+        transrotimport.importTR(context.scene.importfile, context.scene.isTranslationImp, context.scene.isRotationImp, context.scene.new_or_selected)
         ###########################################################
         self.report({'INFO'}, "importing csv")
         return {'FINISHED'}
@@ -127,10 +160,18 @@ class ImportPanel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
 
-        layout.label(text="Select CSV File:")
         layout.prop(scene, "importfile", text="CSV")
+        layout.separator()
+        layout.label(text="Import Rigid Body transformations:")
         layout.operator("scene.importfile")
-        layout.label(text = "(ToDo: to selected object or new sphere(s))")  #maybe we'll make this as simple as 'if no object selected, create a sphere
+        layout.separator()
+        layout.label(text = "Import Translations/Rotations:")
+        #add checkboxes for translations and rotations
+        row = layout.row()
+        row.prop(scene, "isTranslationImp", text="Translation")
+        row.prop(scene, "isRotationImp", text="Rotation")
+        layout.prop (scene, "new_or_selected", expand=True)
+        layout.operator("scene.importtrfile")
 
 
 ###########################################################
@@ -143,10 +184,12 @@ bpy.types.Scene.isSeparate = bpy.props.BoolProperty(
     description="Do you wish to separate the object into peices, and make a locator for each?",
     default=False
 )
-bpy.types.Scene.isSlow = bpy.props.BoolProperty(
-    name="Slow or Fast",
-    description="Slow - vertex based, Fast - bounding box based",
-    default=False
+bpy.types.Scene.isSlow = bpy.props.EnumProperty(
+    items=[
+        ('TRUE', 'Accurate', ''),
+        ('FALSE', 'Fast', '')
+    ],
+    default='TRUE'
 )
 
 # Define an operator for calling vavg
@@ -157,7 +200,6 @@ class vAVGOperator(bpy.types.Operator):
 
     def execute(self, context):
         ###########################################################
-        # TODO: Add logic here
         from . import vAvg
         vAvg.vertAvg(context.scene.isSlow, context.scene.isSeparate)
         ###########################################################
@@ -172,7 +214,6 @@ class ctExOperator(bpy.types.Operator):
 
     def execute(self, context):
         ###########################################################
-        # TODO: Add logic here
         from . import ctExp
         bpy.ops.export_data.marker_data('INVOKE_DEFAULT')
         ###########################################################
@@ -193,16 +234,8 @@ class markersPanel(bpy.types.Panel):
         scene = context.scene
 
         layout.label(text = "vAvg - Marker locations")
-        # Create a boolean variable called isSeparate
-        layout.prop(scene, "isSeparate", text="Separate objects?")
         # Add a segmented control for "Fast" or "Accurate"
-        row = layout.row(align=True)
-        if scene.isSlow:
-            row.prop(scene, "isSlow", toggle=True, text="Accurate", icon="RADIOBUT_ON")
-            row.prop(scene, "isSlow", toggle=True, text="Fast", icon="RADIOBUT_OFF")
-        else:
-            row.prop(scene, "isSlow", toggle=True, text="Accurate", icon="RADIOBUT_OFF")
-            row.prop(scene, "isSlow", toggle=True, text="Fast", icon="RADIOBUT_ON")
+        layout.prop (scene, "isSlow", expand=True)
         #need a button:
         layout.operator("scene.vavg", text="Calculate marker positions")
         layout.separator()
@@ -239,7 +272,6 @@ class CreateAxesWOOperator(bpy.types.Operator):
 
     def execute(self, context):
         ###########################################################
-        # TODO: Add logic here
         scene = context.scene
         from . import createAxes
         createAxes.createNewAxes(scene.axis_input, 0, 5) 
@@ -255,7 +287,6 @@ class CreateAxesWOperator(bpy.types.Operator):
 
     def execute(self, context):
         ###########################################################
-        # TODO: Add logic here
         scene = context.scene
         from . import createAxes
         createAxes.createNewAxes(scene.axis_input, 1, 5)  #hard coding a size of 5cm for now
@@ -374,7 +405,6 @@ class xrommExportOperator(bpy.types.Operator):
 
     def execute(self, context):
         ###########################################################
-        # TODO: Add logic here
         from . import ExportXROMMData
         scene = context.scene
         bpy.ops.export_data.xromm_data('INVOKE_DEFAULT')
@@ -397,6 +427,7 @@ classes = (CreateXCamOperator,
            CreateAxesWOperator,
            CalculateRelativeMotionOperator,
            ImportOperator,
+           ImportTransRotOperator,
            vAVGOperator,
            ctExOperator,
            xrommExportOperator,
