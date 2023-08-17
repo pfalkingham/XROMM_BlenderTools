@@ -10,46 +10,41 @@ The experts of XROMM are still using Maya.  Don't expect much help if you use th
 
 You can see it working here: https://youtu.be/zRH4XBChrgA
 
-## --In Progress--
+## Development
 
 Original Maya tools written by <a href="https://biology.providence.edu/faculty-members/david-baier/">Dave Baier</a> (supported by the US National Science Foundation through an Advances in Biological Informatics grant to PI <a href = "https://vivo.brown.edu/display/ebrainer">Elizabeth Brainerd</a> and CoPIs <a href="https://vivo.brown.edu/display/sgatesy">Stephen Gatesy</a> and David Baier, see link above)
 
-I aim to replicate functionality, rather than code.  Maya isn't for everyone - it takes ages to start up, installs a bunch of cruft that runs in the background (Autodesk app), and is generally not seeing much active development to the UX.  Blender is free and open source, which is far better situation for a set of science tools.  Blender is also much quicker, and more in the community are generally more familiar with it.
+I aim to replicate functionality, rather than code.  Maya isn't for everyone - it takes ages to start up, installs a bunch of cruft that runs in the background (Autodesk app on PC), and is generally not seeing much active development to the UX.  Blender is free and open source, which is far better situation for a set of science tools.  Blender is also much quicker, and more in the community are generally more familiar with it.
 
-Below is a to-do list, in order of priority.  The priority is based on replicating the tools I use most.  Others are welcome to contribute.
+The decision on what to implement is based on replicating the tools I use most.  Others are welcome to contribute, or make requests (email me directly, or use the issues tab)
 
-# To Do
+_Please report all bugs either via email or the issues tab._
 
-## High priority:
+# Implemented tools
 
-~~-- Addon UI: Essentially the equivelent of the MayaTools shelf, a way to interact with the scripts.~~
+-- Addon UI: Essentially the equivelent of the MayaTools shelf, a way to interact with the scripts.
 
-~~-- Xcam import (based on mayacamsv2): import cameras and image planes as exported from XMALab~~  DONE!
+-- Xcam import (based on mayacamsv2): import cameras and image planes as exported from XMALab as MayaCamsv2 (v1 not supported)
 
-----[optional] Xcam import based on mayacamsv1 <- is there really any need?  Lot of work to support out-dated xcam format.
-
--- import:  ~~can import rigid body transormations~~, xyz coordinates to new objects, ~~objs~~.  
-
+-- import:  can import rigid body transormations to objects, or xyz locations and/or rotations to new or selected objects.
  
-~~-- axes: create axes at joints.~~
+-- axes: create axes at joints, with or without locators.
 
-~~-- oRel: calculates relative motion between two axes.~~
+-- oRel: calculates relative motion between two objects (using axes)
 
-~~-- jAx: Joint axes integral to some peoples workflows~~ - This is now done, as can be accomplished through creating axes, then running relative motion.
+-- jAx: Joint axes integral to some peoples workflows: This can be accomplished through creating axes, then running relative motion.
  
-## Low Priority 
+-- CT Marker export: Exports xyz coordinates of CT markers (or any selected object for that matter)
 
-~~-- CT export: Exports xyz coordinates of CT markers~~
+-- vAvg: Calculates average position of a selection of verticies and puts a locator there (related to the above). Two options - fast and accurate (should be more or less the same in most cases)
 
-~~-- vAvg: Calculates average position of a selection of verticies and puts a locator there (related to the above)~~
+-- Export data.  Export translation/rotation data from objects, included _data objects created via oRel.
 
-~~-- exp: Export data.  Complex, and native albeit cumbersome methods exist in blender, or can be scripted later.~~
-
-## Low Priority because I don't use them, but useful to others.
-
--- jcs: Joint coordinate system, not sure I've ever used this.
 
 ## No plans to implement:
 
--- PSDR: pan/scan for looking through xcams.  Blender handles this differently and you can do this natively without the need for PSDR.
--- PStrn: Shader related - may leave this out and handle manually in blender.  Not vital, so may be implemented much later.
+-- PSDR: pan/scan for looking through xcams.  Blender handles cameras differently and you can do this natively without the need for PSDR.
+
+-- PStrn: Shader related - can be easily handled manually in blender.  
+
+-- JCS: Joint coordinate system, not sure I've ever used this, having always used jAx.
