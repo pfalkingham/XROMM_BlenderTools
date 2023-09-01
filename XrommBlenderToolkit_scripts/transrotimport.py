@@ -43,7 +43,7 @@ def importTR(importCSV, doTrans, doRot, isNewObject):
             #create a new object
             bpy.ops.mesh.primitive_uv_sphere_add(radius = 0.5)
             #rename it based on the header
-            name = header[i].split('_')[0]
+            name = header[i].rsplit('_',1)[0]
             #we need some error checking here, because if an object with that name already exists, it'll get .001 added to it, and we won't be able to find it later
             bpy.context.active_object.name = name
             objects[name] = bpy.context.active_object
@@ -55,7 +55,7 @@ def importTR(importCSV, doTrans, doRot, isNewObject):
             #loop through each object in the file
             for i in range(0, len(header), valuesPerObject):
                 #get the object name
-                name = header[i].split('_')[0]
+                name = header[i].rsplit('_',1)[0]
                 #get the object reference from the dictionary
                 obj = objects[name]
                 #get the x,y,z values
