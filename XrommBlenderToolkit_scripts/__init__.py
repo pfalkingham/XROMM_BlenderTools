@@ -7,8 +7,8 @@
 bl_info = {
     "name": "XROMM toolkit for Blender",
     "description": "XROMM toolkit modified for Blender",
-    "author": "falkingham",
-    "version": (0, 1),
+    "author": "Peter Falkingham",
+    "version": (0, 9, 3),
     "blender": (3, 6, 0),
     "location": "",
 }

@@ -18,11 +18,11 @@ def createNewAxes(axisname, locators, axisSize):
     coneRad = axisSize*0.02
 
 
-    bpy.ops.mesh.primitive_cylinder_add(radius=cylRad, depth=cylLen)
+    bpy.ops.mesh.primitive_cylinder_add(radius=cylRad, depth=cylLen, location=(0,0,0))
     cylinderz = bpy.context.active_object
-    bpy.ops.mesh.primitive_cylinder_add(radius=cylRad, depth=cylLen, rotation=(1.5708,0,0))
+    bpy.ops.mesh.primitive_cylinder_add(radius=cylRad, depth=cylLen, rotation=(1.5708,0,0), location=(0,0,0))
     cylindery = bpy.context.active_object
-    bpy.ops.mesh.primitive_cylinder_add(radius=cylRad, depth=cylLen, rotation=(0,1.5708,0))
+    bpy.ops.mesh.primitive_cylinder_add(radius=cylRad, depth=cylLen, rotation=(0,1.5708,0), location=(0,0,0))
     cylinderx = bpy.context.active_object
 
 
@@ -99,6 +99,5 @@ def createNewAxes(axisname, locators, axisSize):
         constraint3 = bpy.data.objects[axisname].constraints[-1]
         constraint3.target = bpy.data.objects[axisname+"_posZ"]
         constraint3.track_axis='TRACK_Z'
-        
-        
-            
+
+
