@@ -3,6 +3,10 @@ A version of the XROMM Maya Tools (https://bitbucket.org/xromm/xromm_mayatools),
 
 Download latest release here: https://github.com/pfalkingham/XROMM_BlenderTools/releases
 
+*Availble directly from within blender using [Blender Extensions](https://extensions.blender.org/add-ons/xromm-tools/). Go to Edit->Preferences->Get Extensions and search for 'XROMM':
+![image](https://github.com/user-attachments/assets/dad68283-86d4-482b-9276-45bd03ba8388)
+
+
 ## A warning ##
 The experts of XROMM are still using Maya.  Don't expect much help if you use this. In fact, I _strongly_ recommend you don't use this for anything important just yet! 
 
