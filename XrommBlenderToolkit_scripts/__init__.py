@@ -8,7 +8,7 @@ bl_info = {
     "name": "XROMM toolkit for Blender",
     "description": "XROMM toolkit modified for Blender",
     "author": "Peter Falkingham",
-    "version": (0, 9, 3),
+    "version": (0, 9, 4),
     "blender": (3, 6, 0),
     "location": "",
 }
@@ -33,6 +33,7 @@ classes = (
     xrommUI.markersPanel,
     xrommUI.axesPanel,
     xrommUI.exportPanel,
+    xrommUI.AboutPanel,
     xrommUI.CreateAxesWOOperator,
     xrommUI.CreateAxesWOperator,
     xrommUI.CalculateRelativeMotionOperator,

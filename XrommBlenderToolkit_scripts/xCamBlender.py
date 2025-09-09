@@ -220,15 +220,20 @@ def importXCam(mayacamfile, camName, image_path, is_image_sequence):
     if is_image_sequence:
         # Check if the file is a movie file
         if os.path.splitext(image_path)[1].lower() in {'.mp4', '.avi', '.mov'}:
-            # Set the node type to 'ShaderNodeTexMovie'
-            image_node = node_tree.nodes.new(type='ShaderNodeTexMovie')
+            # Load the movie file into the image node
+            image_node.image = bpy.data.images.load(image_path)
+            image_node.image.source = 'MOVIE'
             
-            # Load the movie file
-            image_node.movie = bpy.data.movieclips.load(image_path)
+            # Set the frame duration from the movie clip
+            # We need to find the movie clip associated with the image
+            for mc in bpy.data.movieclips:
+                if mc.filepath == image_node.image.filepath:
+                    image_node.image_user.frame_duration = mc.frame_duration
+                    break
             
-            # Set the frame duration
-            image_node.frame_duration = image_node.movie.frame_duration
-            
+            # Enable auto-refresh for the movie file
+            image_node.image_user.use_auto_refresh = True
+                        
         else:
             # Load the image sequence
             image_node.image = bpy.data.images.load(image_path)
@@ -239,13 +244,13 @@ def importXCam(mayacamfile, camName, image_path, is_image_sequence):
             # Set the frame duration
             file_name = os.path.basename(image_path)
             file_name = re.sub(r'\d+', '*', file_name)
-            image_path = os.path.join(os.path.dirname(image_path), file_name)
-            files = glob.glob(image_path)
+            image_path_glob = os.path.join(os.path.dirname(image_path), file_name)
+            files = glob.glob(image_path_glob)
             num_frames = len(files)
             image_node.image_user.frame_duration = num_frames
-        
-        # Enable auto-refresh for the image sequence or movie file
-        image_node.image_user.use_auto_refresh = True
+            
+            # Enable auto-refresh for the image sequence
+            image_node.image_user.use_auto_refresh = True
             
     else:
         # Load the single image

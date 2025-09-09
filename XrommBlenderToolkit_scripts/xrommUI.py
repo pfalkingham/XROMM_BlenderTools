@@ -4,6 +4,7 @@
 #######################
 
 import bpy
+import sys
 
 
 ###########################################################
@@ -47,6 +48,7 @@ class CreateXCamOperator(bpy.types.Operator):
     bl_idname = "scene.create_xcam"
     bl_label = "Create XCam"
     bl_description = "Create xCam from file+images"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         scene = context.scene
@@ -124,13 +126,61 @@ class ImportOperator(bpy.types.Operator):
     bl_idname = "scene.importfile"
     bl_label = "Import Rigid Body Data to selected object"
     bl_description = "Import data"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
-        ###########################################################
+        import csv
         from . import xrommimport
-        xrommimport.importRBT(context.scene.importfile)
-        ###########################################################
-        self.report({'INFO'}, "importing csv")
+
+        filepath = context.scene.importfile
+        if not filepath:
+            self.report({'ERROR'}, "No file selected.")
+            return {'CANCELLED'}
+
+        # --- Analyze the CSV to decide on the import path ---
+        try:
+            with open(filepath, newline='') as csvfile:
+                first_row_str = csvfile.readline()
+                if not first_row_str:
+                    self.report({'ERROR'}, "CSV file is empty.")
+                    return {'CANCELLED'}
+
+                try:
+                    float(first_row_str.split(',')[0])
+                    has_header = False
+                except ValueError:
+                    has_header = True
+
+                csvfile.seek(0)
+                reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+                header = next(reader) if has_header else [f'col_{i}' for i in range(len(first_row_str.split(',')))]
+
+                # Check if there's a frame column based on total column count
+                total_cols = len(header)
+                if total_cols % 16 == 1:
+                    has_frame_col = True
+                    data_cols = total_cols - 1
+                elif total_cols % 16 == 0:
+                    has_frame_col = False
+                    data_cols = total_cols
+                else:
+                    self.report({'ERROR'}, f"Incorrect number of data columns. Expected multiple of 16 or 16n+1, got {total_cols}.")
+                    return {'CANCELLED'}
+                    
+                num_objects = data_cols // 16
+
+        except Exception as e:
+            self.report({'ERROR'}, f"File analysis failed: {e}")
+            return {'CANCELLED'}
+
+        # --- Decide on single vs. multi-object import ---
+        if num_objects > 1:
+            self.report({'ERROR'}, "Combined files with multiple objects are not compatible yet. Please import objects individually.")
+            return {'CANCELLED'}
+        else:
+            # Only one object, use the original direct import logic
+            xrommimport.importRBT(filepath)
+
         return {'FINISHED'}
     
 # Define an operator for creating an xCam
@@ -138,6 +188,7 @@ class ImportTransRotOperator(bpy.types.Operator):
     bl_idname = "scene.importtrfile"
     bl_label = "Import translation/rotation data"
     bl_description = "Import translation and/or rotation data to selected object or new sphere(s)"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         ###########################################################
@@ -197,6 +248,7 @@ class vAVGOperator(bpy.types.Operator):
     bl_idname = "scene.vavg"
     bl_label = "Calculate marker positions"
     bl_description = "Calculate marker positions"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         ###########################################################
@@ -269,6 +321,7 @@ class CreateAxesWOOperator(bpy.types.Operator):
     bl_idname = "scene.create_axes_wo"
     bl_label = "Create Axes"
     bl_description = "Create Axes WITHOUT locators"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         ###########################################################
@@ -284,6 +337,7 @@ class CreateAxesWOperator(bpy.types.Operator):
     bl_idname = "scene.create_axes_with"
     bl_label = "Create Axes with locators"
     bl_description = "Create Axes with locators"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         ###########################################################
@@ -335,6 +389,7 @@ class CalculateRelativeMotionOperator(bpy.types.Operator):
     bl_idname = "scene.calculate_relative_motion"
     bl_label = "Calculate relative motion"
     bl_description = "Calculate relative motion"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         # Get the selected objects from the object selectors
@@ -413,6 +468,44 @@ class xrommExportOperator(bpy.types.Operator):
         return {'FINISHED'}
 
 ###########################################################
+#ABOUT UI CODE
+###########################################################
+
+# Define a panel class
+class AboutPanel(bpy.types.Panel):
+    bl_label = "About"
+    bl_idname = "VIEW3D_PT_about"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "XROMM"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        layout = self.layout
+        
+        # Get addon's bl_info
+        # The __package__ is XrommBlenderToolkit_scripts, but the addon name is XROMM_BlenderTools
+        # So we need to get the parent module's info.
+        addon_name = __name__.split('.')[0]
+        addon_module = sys.modules.get(addon_name)
+        if addon_module:
+            bl_info = getattr(addon_module, 'bl_info', {})
+            
+            name = bl_info.get("name", "")
+            version = bl_info.get("version", (0,0,0))
+            author = bl_info.get("author", "")
+
+            if name:
+                layout.label(text=name)
+            if version:
+                layout.label(text=f"Version: {'.'.join(map(str, version))}")
+            if author:
+                layout.label(text=f"Author: {author}")
+        else:
+            layout.label(text="Could not find addon information.")
+
+
+###########################################################
 #Register/Unregister Classes (may need changing for addon)
 ###########################################################
 
@@ -423,6 +516,7 @@ classes = (CreateXCamOperator,
            markersPanel, 
            axesPanel, 
            exportPanel,
+           AboutPanel,
            CreateAxesWOOperator,
            CreateAxesWOperator,
            CalculateRelativeMotionOperator,
