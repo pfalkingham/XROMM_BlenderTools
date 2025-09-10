@@ -49,20 +49,31 @@ def importRBT(importCSV, object_mapping=None):
             reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             
             header = next(reader)
-            
+
             if not has_header:
-                # If no header, the 'header' we just read is actually the first data row.
-                # We need to put it back to be processed.
-                # We'll also generate a placeholder header.
+                # We actually just read the first data row (no header). Determine column counts.
                 num_cols = len(header)
+                # Detect frame column by total column count pattern (16n or 16n+1)
+                if num_cols % 16 == 1:
+                    has_frame_col = True
+                    data_cols = num_cols - 1
+                elif num_cols % 16 == 0:
+                    has_frame_col = False
+                    data_cols = num_cols
+                else:
+                    print(f"Error: CSV file has an incorrect number of columns ({num_cols}). Expected multiple of 16 or 16n+1.")
+                    return
+                # Create placeholder header names
                 header = [f'col_{i}' for i in range(num_cols)]
-                csvfile.seek(0) # Reset again to read all data rows
-            
-            # Check for frame column from the (real or generated) header
-            has_frame_col = header[0].lower() == 'frame'
-            
-            # Determine number of objects
-            data_cols = len(header) - (1 if has_frame_col else 0)
+                # Rewind & recreate reader so the first data row is processed later
+                csvfile.seek(0)
+                reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            else:
+                # Header present: decide if first column is frame by its label
+                has_frame_col = header[0].lower() == 'frame'
+                data_cols = len(header) - (1 if has_frame_col else 0)
+
+            # Determine number of objects from data column count
             if data_cols % 16 != 0:
                 print(f"Error: CSV file has an incorrect number of data columns ({data_cols}). Should be a multiple of 16.")
                 # Here you might want to raise an exception to be caught by the UI
