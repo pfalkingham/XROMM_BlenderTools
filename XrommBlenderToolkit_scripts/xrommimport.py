@@ -70,12 +70,16 @@ def importRBT(importCSV, object_mapping=None):
             
             num_objects = data_cols // 16
             
-            # Extract object names from header
+            # Extract / create object (bone) names
             file_object_names = []
             for i in range(num_objects):
                 col_index = (i * 16) + (1 if has_frame_col else 0)
                 base_name = header[col_index].split('_')[0]
                 file_object_names.append(base_name)
+
+            # If there was no header the base_name will repeat (e.g. 'col') – replace with bone1, bone2, ...
+            if not has_header:
+                file_object_names = [f"bone{i+1}" for i in range(num_objects)]
 
             # --- 2. Finalize Object Mapping ---
             if object_mapping is None:
@@ -87,9 +91,8 @@ def importRBT(importCSV, object_mapping=None):
                         print("Error: Please select an object to import the data to.")
                         return
                 else:
-                    # This case will be handled by the UI pop-up in the next step.
-                    # For now, we can't proceed without a mapping.
-                    print(f"Info: Multi-object file detected ({', '.join(file_object_names)}). UI interaction needed.")
+                    # Multi-object file with no mapping supplied (should be created via UI before calling this).
+                    print(f"Info: Multi-object file detected ({', '.join(file_object_names)}). Provide an object_mapping.")
                     return
             
             # --- 3. Read and Apply Data ---

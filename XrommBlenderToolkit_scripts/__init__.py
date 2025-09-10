@@ -8,7 +8,7 @@ bl_info = {
     "name": "XROMM toolkit for Blender",
     "description": "XROMM toolkit modified for Blender",
     "author": "Peter Falkingham",
-    "version": (0, 9, 4),
+    "version": (0, 9, 6),
     "blender": (3, 6, 0),
     "location": "",
 }
@@ -25,6 +25,7 @@ from . import vAvg
 from . import ctExp
 from . import ExportXROMMData
 from . import transrotimport
+from .xrommUI import XROMMBoneMapItem, XROMMMultiBoneImportOperator
 
 classes = (
     xrommUI.CreateXCamOperator,
@@ -44,15 +45,27 @@ classes = (
     xrommUI.xrommExportOperator,
     ctExp.ExportMarkerData,
     ExportXROMMData.ExpXROMMData,
+    XROMMBoneMapItem,
+    XROMMMultiBoneImportOperator,
 )
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+    # Dynamic props for multi-bone import
+    from bpy.props import CollectionProperty, StringProperty
+    if not hasattr(bpy.types.WindowManager, 'xromm_bone_map'):
+        bpy.types.WindowManager.xromm_bone_map = CollectionProperty(type=classes[-2])  # XROMMBoneMapItem
+    if not hasattr(bpy.types.WindowManager, 'xromm_multi_import_file'):
+        bpy.types.WindowManager.xromm_multi_import_file = StringProperty()
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+    if hasattr(bpy.types.WindowManager, 'xromm_bone_map'):
+        del bpy.types.WindowManager.xromm_bone_map
+    if hasattr(bpy.types.WindowManager, 'xromm_multi_import_file'):
+        del bpy.types.WindowManager.xromm_multi_import_file
 
 if __name__ == "__main__":
     register()

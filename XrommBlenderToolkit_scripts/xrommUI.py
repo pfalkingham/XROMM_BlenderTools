@@ -5,6 +5,8 @@
 
 import bpy
 import sys
+from bpy.props import StringProperty, PointerProperty, CollectionProperty
+from bpy.types import PropertyGroup
 
 
 ###########################################################
@@ -137,7 +139,7 @@ class ImportOperator(bpy.types.Operator):
             self.report({'ERROR'}, "No file selected.")
             return {'CANCELLED'}
 
-        # --- Analyze the CSV to decide on the import path ---
+    # --- Analyze the CSV to decide on the import path ---
         try:
             with open(filepath, newline='') as csvfile:
                 first_row_str = csvfile.readline()
@@ -169,19 +171,85 @@ class ImportOperator(bpy.types.Operator):
                     
                 num_objects = data_cols // 16
 
+                # Build object (bone) names
+                file_object_names = []
+                if has_header:
+                    # reset reader to get full header again
+                    csvfile.seek(0)
+                    reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+                    header_row = next(reader)
+                    for i in range(num_objects):
+                        idx = (i * 16) + (1 if has_frame_col else 0)
+                        base_name = header_row[idx].split('_')[0]
+                        file_object_names.append(base_name)
+                else:
+                    file_object_names = [f"bone{i+1}" for i in range(num_objects)]
+
         except Exception as e:
             self.report({'ERROR'}, f"File analysis failed: {e}")
             return {'CANCELLED'}
 
         # --- Decide on single vs. multi-object import ---
         if num_objects > 1:
-            self.report({'ERROR'}, "Combined files with multiple objects are not compatible yet. Please import objects individually.")
-            return {'CANCELLED'}
+            # Store temporary data on the window manager to be used by the popup operator
+            wm = context.window_manager
+            wm.xromm_multi_import_file = filepath
+            collection = wm.xromm_bone_map
+            collection.clear()
+            for name in file_object_names:
+                item = collection.add()
+                item.bone_name = name
+                item.object_ref = None
+            # invoke popup
+            bpy.ops.scene.xromm_multi_bone_map('INVOKE_DEFAULT')
         else:
-            # Only one object, use the original direct import logic
             xrommimport.importRBT(filepath)
 
         return {'FINISHED'}
+
+#############################
+# Multi-bone mapping support
+#############################
+
+class XROMMBoneMapItem(PropertyGroup):
+    bone_name: StringProperty(name="Bone")
+    object_ref: PointerProperty(type=bpy.types.Object, name="Object")
+
+class XROMMMultiBoneImportOperator(bpy.types.Operator):
+    bl_idname = "scene.xromm_multi_bone_map"
+    bl_label = "Map Bones to Objects"
+    bl_description = "Assign scene objects to imported bones"
+    bl_options = {'UNDO'}
+
+    def draw(self, context):
+        layout = self.layout
+        wm = context.window_manager
+        layout.label(text="Assign each bone to a Blender object:")
+        col = layout.column()
+        for item in wm.xromm_bone_map:
+            row = col.row(align=True)
+            row.label(text=item.bone_name)
+            row.prop(item, "object_ref", text="")
+
+    def execute(self, context):
+        from . import xrommimport
+        wm = context.window_manager
+        mapping = {}
+        missing = []
+        for item in wm.xromm_bone_map:
+            if item.object_ref:
+                mapping[item.bone_name] = item.object_ref.name
+            else:
+                missing.append(item.bone_name)
+        if missing:
+            self.report({'ERROR'}, f"Unassigned bones: {', '.join(missing)}")
+            return {'CANCELLED'}
+        xrommimport.importRBT(wm.xromm_multi_import_file, mapping)
+        self.report({'INFO'}, "Imported multi-bone rigid body data")
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self, width=400)
     
 # Define an operator for creating an xCam
 class ImportTransRotOperator(bpy.types.Operator):
