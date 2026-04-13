@@ -8,7 +8,7 @@ Download latest release here: https://github.com/pfalkingham/XROMM_BlenderTools/
 
 
 ## A warning ##
-The experts of XROMM are still using Maya.  Don't expect much help if you use this. In fact, I _strongly_ recommend you don't use this for anything important just yet! 
+Most of the experts of XROMM are still using Maya, and that's where the expertise still resides, so help may be more limited in Blender.
 
 ## YouTube video ##
 
