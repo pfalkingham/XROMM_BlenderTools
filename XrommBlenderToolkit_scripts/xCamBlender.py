@@ -59,9 +59,9 @@ def importXCam(mayacamfile, camName, image_path, is_image_sequence):
         inverse_rotation_matrix4[i][3] = inverse_translation_rotation_vector[i]
     inverse_rotation_matrix4[3][3] = 1
 
-    m = np.transpose(inverse_rotation_matrix4)
-
-    m[0] = -m[0]
+    m = inverse_rotation_matrix4.transposed()
+    for j in range(4):
+        m[0][j] = -m[0][j]
 
     camera.matrix_world = m
 
@@ -200,6 +200,10 @@ def importXCam(mayacamfile, camName, image_path, is_image_sequence):
     ########################
     #add image or sequence to plane
     ########################
+
+    # Support creating camera + plane without assigning an image.
+    if not image_path or not image_path.strip():
+        return
 
     # Create a new material
     material = bpy.data.materials.new(name=camName+"material")
