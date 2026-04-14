@@ -59,9 +59,9 @@ def importXCam(mayacamfile, camName, image_path, is_image_sequence):
         inverse_rotation_matrix4[i][3] = inverse_translation_rotation_vector[i]
     inverse_rotation_matrix4[3][3] = 1
 
-    m = inverse_rotation_matrix4.transposed()
-    for j in range(4):
-        m[0][j] = -m[0][j]
+    # Keep legacy orientation behavior, but avoid read-only NumPy views.
+    m = np.transpose(np.array(inverse_rotation_matrix4, dtype=float)).copy()
+    m[0] = -m[0]
 
     camera.matrix_world = m
 
