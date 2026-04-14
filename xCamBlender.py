@@ -59,7 +59,8 @@ def importXCam(mayacamfile, camName, image_path, is_image_sequence):
         inverse_rotation_matrix4[i][3] = inverse_translation_rotation_vector[i]
     inverse_rotation_matrix4[3][3] = 1
 
-    m = np.transpose(inverse_rotation_matrix4)
+    # NumPy 2 can expose this transpose as a read-only view; force a writable copy.
+    m = np.transpose(np.array(inverse_rotation_matrix4, dtype=float)).copy()
 
     m[0] = -m[0]
 
@@ -216,45 +217,53 @@ def importXCam(mayacamfile, camName, image_path, is_image_sequence):
     # Create an Image Texture node
     image_node = node_tree.nodes.new(type='ShaderNodeTexImage')
 
-    # Check if the file is an image sequence or movie file
-    if is_image_sequence:
-        # Check if the file is a movie file
-        if os.path.splitext(image_path)[1].lower() in {'.mp4', '.avi', '.mov'}:
-            # Load the movie file into the image node
-            image_node.image = bpy.data.images.load(image_path)
-            image_node.image.source = 'MOVIE'
-            
-            # Set the frame duration from the movie clip
-            # We need to find the movie clip associated with the image
-            for mc in bpy.data.movieclips:
-                if mc.filepath == image_node.image.filepath:
-                    image_node.image_user.frame_duration = mc.frame_duration
-                    break
-            
-            # Enable auto-refresh for the movie file
-            image_node.image_user.use_auto_refresh = True
-                        
-        else:
-            # Load the image sequence
-            image_node.image = bpy.data.images.load(image_path)
-            
-            # Set the source to 'SEQUENCE'
-            image_node.image.source = 'SEQUENCE'
-            
-            # Set the frame duration
-            file_name = os.path.basename(image_path)
-            file_name = re.sub(r'\d+', '*', file_name)
-            image_path_glob = os.path.join(os.path.dirname(image_path), file_name)
-            files = glob.glob(image_path_glob)
-            num_frames = len(files)
-            image_node.image_user.frame_duration = num_frames
-            
-            # Enable auto-refresh for the image sequence
-            image_node.image_user.use_auto_refresh = True
-            
-    else:
-        # Load the single image
-        image_node.image = bpy.data.images.load(image_path)
+    # Loading image media is optional; leave texture node unassigned when path is blank/invalid.
+    resolved_image_path = bpy.path.abspath(image_path).strip() if image_path else ""
+    if resolved_image_path and os.path.exists(resolved_image_path):
+        try:
+            # Check if the file is an image sequence or movie file
+            if is_image_sequence:
+                # Check if the file is a movie file
+                if os.path.splitext(resolved_image_path)[1].lower() in {'.mp4', '.avi', '.mov'}:
+                    # Load the movie file into the image node
+                    image_node.image = bpy.data.images.load(resolved_image_path)
+                    image_node.image.source = 'MOVIE'
+
+                    # Set the frame duration from the movie clip
+                    # We need to find the movie clip associated with the image
+                    for mc in bpy.data.movieclips:
+                        if mc.filepath == image_node.image.filepath:
+                            image_node.image_user.frame_duration = mc.frame_duration
+                            break
+
+                    # Enable auto-refresh for the movie file
+                    image_node.image_user.use_auto_refresh = True
+
+                else:
+                    # Load the image sequence
+                    image_node.image = bpy.data.images.load(resolved_image_path)
+
+                    # Set the source to 'SEQUENCE'
+                    image_node.image.source = 'SEQUENCE'
+
+                    # Set the frame duration
+                    file_name = os.path.basename(resolved_image_path)
+                    file_name = re.sub(r'\d+', '*', file_name)
+                    image_path_glob = os.path.join(os.path.dirname(resolved_image_path), file_name)
+                    files = glob.glob(image_path_glob)
+                    num_frames = len(files)
+                    image_node.image_user.frame_duration = num_frames
+
+                    # Enable auto-refresh for the image sequence
+                    image_node.image_user.use_auto_refresh = True
+
+            else:
+                # Load the single image
+                image_node.image = bpy.data.images.load(resolved_image_path)
+        except RuntimeError as exc:
+            print(f"XROMM_BlenderTools: could not load image media '{resolved_image_path}': {exc}")
+    elif image_path:
+        print(f"XROMM_BlenderTools: image path not found, skipping media load: {resolved_image_path}")
 
     # Create a Diffuse BSDF node
     diffuse_node = node_tree.nodes.new(type='ShaderNodeBsdfDiffuse')
