@@ -5,6 +5,7 @@
 
 import bpy
 import sys
+import os
 from bpy.props import StringProperty, PointerProperty, CollectionProperty
 from bpy.types import PropertyGroup
 
@@ -54,6 +55,14 @@ class CreateXCamOperator(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
+        if not scene.maya_cam_file or not os.path.isfile(scene.maya_cam_file):
+            self.report({'ERROR'}, "Please select a valid MayaCam file.")
+            return {'CANCELLED'}
+
+        if scene.images_file.strip() and not os.path.isfile(scene.images_file):
+            self.report({'ERROR'}, "Image/movie path is invalid. Leave blank if you do not want an image plane texture.")
+            return {'CANCELLED'}
+
         from . import xCamBlender
         xCamBlender.importXCam(scene.maya_cam_file, scene.text_input, scene.images_file, scene.image_sequence)
         self.report({'INFO'}, "Creating xCam2")
