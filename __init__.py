@@ -8,7 +8,7 @@ bl_info = {
     "name": "XROMM toolkit for Blender",
     "description": "XROMM toolkit modified for Blender",
     "author": "Peter Falkingham",
-    "version": (0, 9, 7),
+    "version": (0, 9, 8),
     "blender": (5, 1, 0),
     "location": "",
 }
@@ -25,6 +25,7 @@ from . import vAvg
 from . import ctExp
 from . import ExportXROMMData
 from . import transrotimport
+from . import jcsRel
 from .xrommUI import XROMMBoneMapItem, XROMMMultiBoneImportOperator
 
 classes = (
@@ -38,6 +39,7 @@ classes = (
     xrommUI.CreateAxesWOOperator,
     xrommUI.CreateAxesWOperator,
     xrommUI.CalculateRelativeMotionOperator,
+    xrommUI.CalculateJCSRelativeMotionOperator,
     xrommUI.ImportOperator,
     xrommUI.ImportTransRotOperator,
     xrommUI.vAVGOperator,

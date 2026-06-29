@@ -393,6 +393,17 @@ bpy.types.Scene.oRel_axes = bpy.props.PointerProperty(type=bpy.types.Object)
 bpy.types.Scene.prox_obj = bpy.props.PointerProperty(type=bpy.types.Object)
 bpy.types.Scene.dist_obj = bpy.props.PointerProperty(type=bpy.types.Object)
 
+# JCS relative motion properties
+bpy.types.Scene.jcs_acsf = bpy.props.PointerProperty(type=bpy.types.Object)
+bpy.types.Scene.jcs_acsm = bpy.props.PointerProperty(type=bpy.types.Object)
+bpy.types.Scene.jcs_mode = bpy.props.EnumProperty(
+    items=[
+        ('ISB', 'ISB Standard', 'Z-Y\'-X\'\' with floating Y\' axis (Grood & Suntay 1983)'),
+        ('MG_HINGE', 'M&G Hinge', 'Prism translations rotate with FE only (Manafzadeh & Gatesy 2021)'),
+    ],
+    default='ISB',
+)
+
 # Define an operator for creating a axes without locator
 class CreateAxesWOOperator(bpy.types.Operator):
     bl_idname = "scene.create_axes_wo"
@@ -461,6 +472,13 @@ class axesPanel(bpy.types.Panel):
         layout.separator()
         layout.operator("scene.calculate_relative_motion", text="Calculate relative motion")
 
+        layout.separator()
+        layout.label(text = "JCS Relative Motion (existing ACS axes):")
+        layout.prop_search(scene, "jcs_acsf", scene, "objects", text="ACSf (proximal)")
+        layout.prop_search(scene, "jcs_acsm", scene, "objects", text="ACSm (distal)")
+        layout.prop(scene, "jcs_mode", text="Mode")
+        layout.operator("scene.calculate_jcs_relative_motion", text="Calculate JCS relative motion")
+
 # Define an operator for calculating relative motion
 class CalculateRelativeMotionOperator(bpy.types.Operator):
     bl_idname = "scene.calculate_relative_motion"
@@ -482,6 +500,28 @@ class CalculateRelativeMotionOperator(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
+# Define an operator for calculating JCS relative motion
+class CalculateJCSRelativeMotionOperator(bpy.types.Operator):
+    bl_idname = "scene.calculate_jcs_relative_motion"
+    bl_label = "Calculate JCS relative motion"
+    bl_description = "Calculate JCS relative motion between existing ACS axes"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        acsf_obj = context.scene.jcs_acsf
+        acsm_obj = context.scene.jcs_acsm
+        mode = context.scene.jcs_mode
+
+        if not acsf_obj or not acsm_obj:
+            self.report({'ERROR'}, "Please select both ACSf and ACSm objects.")
+            return {'CANCELLED'}
+
+        from . import jcsRel
+        jcsRel.calc_jcs_relative_motion(acsf_obj, acsm_obj, mode)
+
+        self.report({'INFO'}, f"JCS relative motion calculated ({mode})")
+        return {'FINISHED'}
 
 
 ###########################################################
@@ -550,11 +590,12 @@ class xrommExportOperator(bpy.types.Operator):
 
 # Define a panel class
 class AboutPanel(bpy.types.Panel):
-    bl_label = "About"
+    bl_label = "XROMM for Blender v0.9.7"
     bl_idname = "VIEW3D_PT_about"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "XROMM"
+    bl_order = 0
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -578,6 +619,9 @@ class AboutPanel(bpy.types.Panel):
                 layout.label(text=f"Version: {'.'.join(map(str, version))}")
             if author:
                 layout.label(text=f"Author: {author}")
+            layout.separator()
+            row = layout.row()
+            row.operator("wm.url_open", text="GitHub Repository", icon='URL').url = "https://github.com/pfalkingham/XROMM_BlenderTools/"
         else:
             layout.label(text="Could not find addon information.")
 
@@ -597,6 +641,7 @@ classes = (CreateXCamOperator,
            CreateAxesWOOperator,
            CreateAxesWOperator,
            CalculateRelativeMotionOperator,
+           CalculateJCSRelativeMotionOperator,
            ImportOperator,
            ImportTransRotOperator,
            vAVGOperator,
