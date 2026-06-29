@@ -9,7 +9,7 @@ import math
 from mathutils import Matrix, Vector
 
 
-def calc_jcs_relative_motion(acsf_obj, acsm_obj, mode):
+def calc_jcs_relative_motion(acsf_obj, acsm_obj, mode, neutral_frame=None):
     rel_name = acsm_obj.name + "_Data"
 
     data_obj = bpy.data.objects.new(rel_name, None)
@@ -17,10 +17,16 @@ def calc_jcs_relative_motion(acsf_obj, acsm_obj, mode):
     bpy.context.collection.objects.link(data_obj)
     data_obj.rotation_mode = 'XYZ'
 
+    if neutral_frame is not None:
+        bpy.context.scene.frame_set(neutral_frame)
+        R_neutral = acsf_obj.matrix_world.inverted() @ acsm_obj.matrix_world
+
     for frame in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end + 1):
         bpy.context.scene.frame_set(frame)
 
         R = acsf_obj.matrix_world.inverted() @ acsm_obj.matrix_world
+        if neutral_frame is not None:
+            R = R_neutral.inverted() @ R
         m = R.to_3x3()
         v = R.to_translation()
 

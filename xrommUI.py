@@ -403,6 +403,18 @@ bpy.types.Scene.jcs_mode = bpy.props.EnumProperty(
     ],
     default='ISB',
 )
+bpy.types.Scene.jcs_reference_mode = bpy.props.EnumProperty(
+    items=[
+        ('ABSOLUTE', 'Absolute', 'Output absolute relative motion'),
+        ('RELATIVE', 'Relative to frame', 'Output motion relative to a neutral frame'),
+    ],
+    default='ABSOLUTE',
+)
+bpy.types.Scene.jcs_neutral_frame = bpy.props.IntProperty(
+    name="Neutral frame",
+    description="Frame where output reads zero",
+    default=0,
+)
 
 # Define an operator for creating a axes without locator
 class CreateAxesWOOperator(bpy.types.Operator):
@@ -477,6 +489,9 @@ class axesPanel(bpy.types.Panel):
         layout.prop_search(scene, "jcs_acsf", scene, "objects", text="ACSf (proximal)")
         layout.prop_search(scene, "jcs_acsm", scene, "objects", text="ACSm (distal)")
         layout.prop(scene, "jcs_mode", text="Mode")
+        layout.prop(scene, "jcs_reference_mode", text="Reference")
+        if scene.jcs_reference_mode == 'RELATIVE':
+            layout.prop(scene, "jcs_neutral_frame", text="Zero frame")
         layout.operator("scene.calculate_jcs_relative_motion", text="Calculate JCS relative motion")
 
 # Define an operator for calculating relative motion
@@ -512,15 +527,19 @@ class CalculateJCSRelativeMotionOperator(bpy.types.Operator):
         acsf_obj = context.scene.jcs_acsf
         acsm_obj = context.scene.jcs_acsm
         mode = context.scene.jcs_mode
+        neutral = context.scene.jcs_neutral_frame if context.scene.jcs_reference_mode == 'RELATIVE' else None
 
         if not acsf_obj or not acsm_obj:
             self.report({'ERROR'}, "Please select both ACSf and ACSm objects.")
             return {'CANCELLED'}
 
         from . import jcsRel
-        jcsRel.calc_jcs_relative_motion(acsf_obj, acsm_obj, mode)
+        jcsRel.calc_jcs_relative_motion(acsf_obj, acsm_obj, mode, neutral_frame=neutral)
 
-        self.report({'INFO'}, f"JCS relative motion calculated ({mode})")
+        label = f"JCS relative motion calculated ({mode})"
+        if neutral is not None:
+            label += f", zeroed at frame {neutral}"
+        self.report({'INFO'}, label)
         return {'FINISHED'}
 
 
@@ -590,7 +609,7 @@ class xrommExportOperator(bpy.types.Operator):
 
 # Define a panel class
 class AboutPanel(bpy.types.Panel):
-    bl_label = "XROMM for Blender v0.9.7"
+    bl_label = "XROMM for Blender"
     bl_idname = "VIEW3D_PT_about"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -624,6 +643,13 @@ class AboutPanel(bpy.types.Panel):
             row.operator("wm.url_open", text="GitHub Repository", icon='URL').url = "https://github.com/pfalkingham/XROMM_BlenderTools/"
         else:
             layout.label(text="Could not find addon information.")
+
+
+# Set about panel label dynamically from bl_info
+_addon_mod = sys.modules.get(__name__.split('.')[0])
+if _addon_mod:
+    _ver = ".".join(str(v) for v in _addon_mod.bl_info.get("version", (0, 0, 0)))
+    AboutPanel.bl_label = f"XROMM for Blender v{_ver}"
 
 
 ###########################################################
