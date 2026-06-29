@@ -38,14 +38,19 @@ def createNewAxes(axisname, locators, axisSize):
     if mat_red is None:
         mat_red = bpy.data.materials.new(name="Red")
         mat_red.diffuse_color = (1, 0, 0, 1)
+    mat_red.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value = (1, 0, 0, 1)
+
     mat_green = bpy.data.materials.get("Green")
     if mat_green is None:
         mat_green = bpy.data.materials.new(name="Green")
         mat_green.diffuse_color = (0, 1, 0, 1)
+    mat_green.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value = (0, 1, 0, 1)
+
     mat_blue = bpy.data.materials.get("Blue")
     if mat_blue is None:
         mat_blue = bpy.data.materials.new(name="Blue")
         mat_blue.diffuse_color = (0, 0, 1, 1)
+    mat_blue.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value = (0, 0, 1, 1)
 
     # Set the material indices for the cylinders and cones
     cylinderx.data.materials.append(mat_red)
