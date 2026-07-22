@@ -49,18 +49,24 @@ def write_xromm_data(context, filepath):
     else:
         #get the current frame and assign to 'curFrame'
         curFrame = bpy.context.scene.frame_current
+        depsgraph = bpy.context.view_layer.depsgraph
         #loop through the frames
         for frame in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end+1):
             bpy.context.scene.frame_set(frame)
+            depsgraph.update()  # Force evaluation of constraints/drivers at this frame
             for obj in bpy.context.selected_objects:
+                eval_obj = obj.evaluated_get(depsgraph)
+                mw = eval_obj.matrix_world
+                loc = mw.to_translation()
+                rot = mw.to_euler()
                 if(translation):
-                    f.write(str(obj.location.x)+", ")
-                    f.write(str(obj.location.y)+", ")
-                    f.write(str(obj.location.z)+", ")
+                    f.write(str(loc.x)+", ")
+                    f.write(str(loc.y)+", ")
+                    f.write(str(loc.z)+", ")
                 if(rotation):
-                    f.write(str(math.degrees(obj.rotation_euler.x))+", ")
-                    f.write(str(math.degrees(obj.rotation_euler.y))+", ")
-                    f.write(str(math.degrees(obj.rotation_euler.z))+", ")
+                    f.write(str(math.degrees(rot[0]))+", ")
+                    f.write(str(math.degrees(rot[1]))+", ")
+                    f.write(str(math.degrees(rot[2]))+", ")
             f.write("\n")
         #reset the frame to the original
         bpy.context.scene.frame_set(curFrame)
