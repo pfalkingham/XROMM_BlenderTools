@@ -49,9 +49,12 @@ def importTR(importCSV, doTrans, doRot, isNewObject):
             objects[name] = bpy.context.active_object
 
         #loop through each frame
+        curFrame = bpy.context.scene.frame_current
         for j in range(len(data)):
             #get the frame number
             frame_number = j+1
+            #set to this frame so location/rotation writes go to the correct keyframe
+            bpy.context.scene.frame_set(frame_number)
             #loop through each object in the file
             for i in range(0, len(header), valuesPerObject):
                 #get the object name
@@ -79,6 +82,25 @@ def importTR(importCSV, doTrans, doRot, isNewObject):
                     if not (rx == 'NAN' or ry == 'NAN' or rz == 'NAN'):
                         obj.keyframe_insert(data_path='rotation_euler', frame=frame_number)
 
+        # Restore viewport to original frame and set each object's location
+        # from the CSV data for that frame (Blender doesn't evaluate keyframes
+        # in script context after insertion, so we read directly from data).
+        bpy.context.scene.frame_set(curFrame)
+        for name, obj in objects.items():
+            row_idx = curFrame - 1 if curFrame <= len(data) else None
+            if row_idx is not None:
+                i = list(objects.keys()).index(name) * valuesPerObject
+                if doTrans:
+                    x = float(data[row_idx][i])
+                    y = float(data[row_idx][i+1])
+                    z = float(data[row_idx][i+2])
+                    obj.location = (x, y, z)
+                if doRot:
+                    rx = float(data[row_idx][i+3])
+                    ry = float(data[row_idx][i+4])
+                    rz = float(data[row_idx][i+5])
+                    obj.rotation_euler = (rx, ry, rz)
+
 
 ####################################
 # Apply to selected objects
@@ -93,9 +115,12 @@ def importTR(importCSV, doTrans, doRot, isNewObject):
             bpy.context.window_manager.popup_menu(lambda self, context: self.layout.label(text="Number of selected objects does not match number of objects in file"), title="Warning", icon='ERROR')
             return{'CANCELLED'}
          # Loop through each frame
+        curFrame = bpy.context.scene.frame_current
         for j in range(len(data)):
             # Get the frame number
             frame_number = j+1
+            # Set to this frame so location/rotation writes go to the correct keyframe
+            bpy.context.scene.frame_set(frame_number)
             # Loop through each object in the file
             for i in range(0, len(header), valuesPerObject):
                 # Get the object index
@@ -122,3 +147,21 @@ def importTR(importCSV, doTrans, doRot, isNewObject):
                     #keyframe it if there are no NANs
                     if not (rx == 'NAN' or ry == 'NAN' or rz == 'NAN'):
                         obj.keyframe_insert(data_path='rotation_euler', frame=frame_number)
+
+        # Restore viewport to original frame and set each object's location
+        # from the CSV data for that frame.
+        bpy.context.scene.frame_set(curFrame)
+        for idx, obj in enumerate(selected_objects):
+            row_idx = curFrame - 1 if curFrame <= len(data) else None
+            if row_idx is not None:
+                i = idx * valuesPerObject
+                if doTrans:
+                    x = float(data[row_idx][i])
+                    y = float(data[row_idx][i+1])
+                    z = float(data[row_idx][i+2])
+                    obj.location = (x, y, z)
+                if doRot:
+                    rx = float(data[row_idx][i+3])
+                    ry = float(data[row_idx][i+4])
+                    rz = float(data[row_idx][i+5])
+                    obj.rotation_euler = (rx, ry, rz)
