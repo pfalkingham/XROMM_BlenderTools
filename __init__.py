@@ -3,15 +3,26 @@
 # Written by Peter Falkingham, July 2023.
 #########################################
 
+import os
+import tomllib
 
-bl_info = {
-    "name": "XROMM toolkit for Blender",
-    "description": "XROMM toolkit modified for Blender",
-    "author": "Peter Falkingham",
-    "version": (0, 9, 9),
-    "blender": (5, 1, 0),
-    "location": "",
-}
+
+def get_extension_manifest():
+    """Reads extension metadata from blender_manifest.toml"""
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    manifest_path = os.path.join(dir_path, "blender_manifest.toml")
+    try:
+        with open(manifest_path, "rb") as f:
+            return tomllib.load(f)
+    except Exception as e:
+        print(f"XROMM Toolkit: Failed to read manifest: {e}")
+        return {}
+
+
+_manifest = get_extension_manifest()
+__version__ = _manifest.get("version", "0.0.0")
+__extension_name__ = _manifest.get("name", "XROMM Toolkit")
+__author__ = _manifest.get("maintainer", "")
 
 
 

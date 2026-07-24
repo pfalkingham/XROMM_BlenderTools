@@ -4,10 +4,11 @@
 #######################
 
 import bpy
-import sys
 import os
 from bpy.props import StringProperty, PointerProperty, CollectionProperty
 from bpy.types import PropertyGroup
+
+from . import __version__, __extension_name__, __author__
 
 
 ###########################################################
@@ -619,37 +620,19 @@ class AboutPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        
-        # Get addon's bl_info
-        # The __package__ is XrommBlenderToolkit_scripts, but the addon name is XROMM_BlenderTools
-        # So we need to get the parent module's info.
-        addon_name = __name__.split('.')[0]
-        addon_module = sys.modules.get(addon_name)
-        if addon_module:
-            bl_info = getattr(addon_module, 'bl_info', {})
-            
-            name = bl_info.get("name", "")
-            version = bl_info.get("version", (0,0,0))
-            author = bl_info.get("author", "")
 
-            if name:
-                layout.label(text=name)
-            if version:
-                layout.label(text=f"Version: {'.'.join(map(str, version))}")
-            if author:
-                layout.label(text=f"Author: {author}")
-            layout.separator()
-            row = layout.row()
-            row.operator("wm.url_open", text="GitHub Repository", icon='URL').url = "https://github.com/pfalkingham/XROMM_BlenderTools/"
-        else:
-            layout.label(text="Could not find addon information.")
+        if __extension_name__:
+            layout.label(text=__extension_name__)
+        if __version__:
+            layout.label(text=f"Version: {__version__}")
+        if __author__:
+            layout.label(text=f"Author: {__author__}")
+        layout.separator()
+        row = layout.row()
+        row.operator("wm.url_open", text="GitHub Repository", icon='URL').url = "https://github.com/pfalkingham/XROMM_BlenderTools/"
 
 
-# Set about panel label dynamically from bl_info
-_addon_mod = sys.modules.get(__name__.split('.')[0])
-if _addon_mod:
-    _ver = ".".join(str(v) for v in _addon_mod.bl_info.get("version", (0, 0, 0)))
-    AboutPanel.bl_label = f"XROMM for Blender v{_ver}"
+AboutPanel.bl_label = f"XROMM for Blender v{__version__}"
 
 
 ###########################################################
